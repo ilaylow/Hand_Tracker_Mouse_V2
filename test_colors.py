@@ -16,11 +16,11 @@ OFFSET = 3
 while True:
     ret, frame = cap.read()
 
-    roi_lower_X = 150
-    roi_upper_X = 200
+    roi_lower_X = 100
+    roi_upper_X = 150
 
-    roi_lower_Y = 150
-    roi_upper_Y = 200
+    roi_lower_Y = 100
+    roi_upper_Y = 280
 
     roi = frame[roi_lower_Y + OFFSET: roi_upper_Y - OFFSET, roi_lower_X + OFFSET: roi_upper_X - OFFSET]
     cv2.rectangle(frame, (roi_lower_X, roi_lower_Y), (roi_upper_X, roi_upper_Y), (0, 255, 0), 1)
@@ -35,14 +35,14 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('t'):
         
         # Generate Histogram and Save to Pickle File
-        roi_YCB = cv2.cvtColor(roi, cv2.COLOR_BGR2YCR_CB)
+        roi_hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
-        histogram = cv2.calcHist([roi_YCB], channels=[0, 1], mask=None, histSize = [80, 256], ranges = [0, 180, 0, 256])
+        histogram = cv2.calcHist([roi_hsv], channels=[0, 1], mask=None, histSize = [80, 256], ranges = [0, 180, 0, 256])
         print(type(histogram))
 
         colors = ("r", "g", "b")
         for i, color in enumerate(colors):
-            hist = cv2.calcHist([roi_YCB],[i],None,[256],[0,256])
+            hist = cv2.calcHist([roi_hsv],[i],None,[256],[0,256])
             plt.plot(hist ,color = color)
             plt.xlim([0,256])
             plt.ylim([0,500])

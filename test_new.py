@@ -7,7 +7,7 @@ def convolve(B, r):
     cv2.filter2D(B, -1, D, B)
     return B
 
-test_img = cv2.imread("hand1_day.jpg", cv2.IMREAD_COLOR)
+test_img = cv2.imread("hand1.jpg", cv2.IMREAD_COLOR)
 hsv_img = cv2.cvtColor(test_img, cv2.COLOR_BGR2HSV)
 
 #Load in model histogram

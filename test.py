@@ -1,6 +1,7 @@
 import cv2
 import pickle
 import numpy as np
+import math
 import os
 
 # Argument represents camera number
@@ -16,6 +17,8 @@ roi_upper_Y = 380
 max_hsv = [160, 198, 255]
 min_hsv = [60, 87, 119]
 
+LINE_THRESH = 80
+
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 def convolve(B, r):
@@ -25,6 +28,7 @@ def convolve(B, r):
 
 while True:
     ret, frame = cap.read()
+    number_shown = 0
 
     # Define ROI
     roi = frame[roi_lower_Y: roi_upper_Y, roi_lower_X: roi_upper_X]
@@ -42,10 +46,10 @@ while True:
 
     # Testing out backprojection
     new_img = cv2.calcBackProject([hsv_roi], channels=[0,1], hist= model_hist, ranges=[0,180,0,256], scale=1)
-    new_img = convolve(new_img, r = 5)
+    new_img = convolve(new_img, r = 3)
     
     # Perform image erosion
-    kernel = np.ones((2, 2), np.uint8)
+    kernel = np.ones((3, 3), np.uint8)
     new_img = cv2.erode(new_img, kernel)
     blur_mask = cv2.blur(new_img, (2, 2))
     _, new_img_thresh = cv2.threshold(blur_mask, 0, 255, cv2.THRESH_BINARY)
@@ -75,11 +79,48 @@ while True:
         for i in range(defects.shape[0]):
             _, _, f, _ = defects[i, 0]
             defect_point = tuple(max_contour[f][0])
-            cv2.circle(roi, defect_point, 5, [0, 0, 255], -1)
+            #cv2.circle(roi, defect_point, 5, [0, 0, 255], -1)
         
         # Use these convexDefects to determine the number of fingers
-        print(defects.shape)
+        # Make the assumption that the consecutive contours with the biggest distance between them will
+        # be the ones with fingers
+        defects_point_dist = []
+        for i in range(defects.shape[0]):
+            start, end, far, _ = defects[i, 0]
+            line_start = tuple(max_contour[start][0])
+            line_far = tuple(max_contour[far][0])
+            line_end = tuple(max_contour[end][0])
+            cv2.line(roi,line_start, line_far,[106, 13, 173],2)
+            cv2.line(roi, line_far, line_end, [106, 13, 173], 2)
 
+            # Get a list of 2D Tuples, one thats the euclid dist, and the other the set of point
+            # The Euclid Dist is the average of the two adjacent lines euclid (Doesn't work as well)
+            """ euclid_dist_avg = (math.dist(line_start, line_far) + math.dist(line_far, line_end)) / 2
+            defects_point_dist.append(euclid_dist_avg) """
+
+            # Using cosine rule to determine angle between fingers so we can use it to determine number of fingers
+            # Angle = cos^-1(a^2 + b^2 - c^2 / 2ab)
+            
+            #Calculate line lengths
+            a = math.dist(line_far, line_start)
+            b = math.dist(line_end, line_far)
+            c = math.dist(line_start, line_end)
+
+            angle = math.acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2*a*b))
+            
+            # Check distance for C
+            norm_c = c / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
+            if angle < math.pi / 2 and norm_c >= 0.10:
+                print(norm_c)
+                cv2.circle(roi, (line_far), 5, [0, 0, 255], -1)
+                number_shown+=1
+                
+
+        max_dist_hull = max([math.dist(max_hull[i][0], max_hull[i+1][0]) for i in range(len(max_hull) - 1)])
+        if max_dist_hull >= 100:
+            number_shown += 1
+
+    cv2.putText(frame, 'Number: ' + str(number_shown), (20, 130), font, 1, (200, 255, 255), 2, cv2.LINE_AA)
     cv2.imshow("roi", roi)
     cv2.imshow("frame", frame)
     cv2.imshow("BackProj Mask", new_img_thresh)

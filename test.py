@@ -109,6 +109,10 @@ while True:
             angle = math.acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2*a*b))
             
             # Check distance for C
+
+            ## Need to find more robust method for detecting the true convexity defects on hand
+            # Could try some distance normalisation techniques (doesn't actually work very well)
+            # Looking at relative distances could be an option
             norm_a = a / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
             norm_b = b / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
             norm_c = c / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)

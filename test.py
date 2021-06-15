@@ -21,6 +21,11 @@ LINE_THRESH = 80
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
+#Load in model histogram
+model_file = open("model_hist.pkl", 'rb')
+model_hist = pickle.load(model_file)
+model_file.close()
+
 def convolve(B, r):
     D = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(r,r))
     cv2.filter2D(B, -1, D, B)
@@ -38,11 +43,6 @@ while True:
     cv2.putText(frame, 'Region Of Interest', (10, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
     hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-
-    #Load in model histogram
-    model_file = open("model_hist.pkl", 'rb')
-    model_hist = pickle.load(model_file)
-    model_file.close()
 
     # Testing out backprojection
     new_img = cv2.calcBackProject([hsv_roi], channels=[0,1], hist= model_hist, ranges=[0,180,0,256], scale=1)
@@ -109,9 +109,13 @@ while True:
             angle = math.acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2*a*b))
             
             # Check distance for C
+            norm_a = a / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
+            norm_b = b / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
             norm_c = c / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
             if angle < math.pi / 2 and norm_c >= 0.10:
-                print(norm_c)
+                print(f"A: {norm_a}")
+                print(f"B: {norm_b}")
+                print(f"C: {norm_c}")
                 cv2.circle(roi, (line_far), 5, [0, 0, 255], -1)
                 number_shown+=1
                 

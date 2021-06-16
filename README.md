@@ -1,6 +1,6 @@
 # Hand_Tracker_Mouse_V2
 
-** Note that the above is still in its experimental changes as the algorithm lacks stability. **
+**Note that the above is still in its experimental changes as the algorithm lacks stability.**
 
 The code above is an attempt to experiment with skin detection with different colorspaces through Image BackProjection with the OpenCV library for Python. 
 
@@ -29,15 +29,15 @@ As skin and lighting may differ depending on usage, the code utilises backprojec
 First run test_colors.py and attempt to fit hand within rectangle, as shown in the image below:
 ![Extract Histogram For BackProjection](/images/showing_extract_histogram.png)
 
-Upon pressing, two new files should be generated: ** model_hist_plot.png ** and ** model_hist.pkl **. The model_hist_plot image shows the color distribution of the HSV colorspace (Hue, Saturation, Value).
+Upon pressing, two new files should be generated: **model_hist_plot.png** and **model_hist.pkl**. The model_hist_plot image shows the color distribution of the HSV colorspace (Hue, Saturation, Value).
 
 Next we can either run, count_fingers.py or mouse_tracker.py. The image below demonstrates the use of count_fingers.py.
 
-![Using Count_Fingers.py](/images/showing_extract_histogram.png)
+![Using Count_Fingers.py](/images/counting_fingers.png)
 
 Lastly, please note that performance may differ heavily depending on background environment and light. Any new suggestions for other algorithmic implementations are always welcome. Improvements are being worked on.
 
-** Have fun! **
+**Have fun!**
 
 
 

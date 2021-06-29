@@ -69,7 +69,7 @@ while True:
         defects = cv2.convexityDefects(max_contour, return_hull)
     except:
         defects = None
-        print("Stupid Monotonous Points aren't showing due to self intersections. FUCK")
+        #print("Monotonous Points aren't showing due to self intersections.")
 
     cv2.drawContours(roi, max_contour, -1, (0, 255, 0))
     cv2.drawContours(roi, [max_hull], -1, (255, 0, 0))

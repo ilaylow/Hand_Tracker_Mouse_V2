@@ -7,12 +7,8 @@ import os
 # Argument represents camera number
 cap = cv2.VideoCapture(0)
 
-# Define ROI Regions
-roi_lower_X = 15
-roi_upper_X = 300
-
-roi_lower_Y = 90
-roi_upper_Y = 380
+from BackgroundSubtract import BackGroundSubtract
+from BackgroundSubtract import BLUR_RADIUS, roi_lower_X, roi_lower_Y, roi_upper_X, roi_upper_Y
 
 max_hsv = [160, 198, 255]
 min_hsv = [60, 87, 119]
@@ -31,6 +27,9 @@ def convolve(B, r):
     cv2.filter2D(B, -1, D, B)
     return B
 
+gray_background_roi = BackGroundSubtract.read_initial_background(cap)
+print("Finished Reading Background...")
+
 while True:
     ret, frame = cap.read()
     number_shown = 0
@@ -38,11 +37,7 @@ while True:
     # Define ROI
     roi = frame[roi_lower_Y: roi_upper_Y, roi_lower_X: roi_upper_X]
 
-    # Params are (img, lower right coord, upper left coord, rgb color, thickness)
-    cv2.rectangle(frame, (roi_lower_X, roi_lower_Y), (roi_upper_X, roi_upper_Y), (0, 255, 0), 5)
-    cv2.putText(frame, 'Region Of Interest', (10, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
-    hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+    """ hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
     # Testing out backprojection
     new_img = cv2.calcBackProject([hsv_roi], channels=[0,1], hist= model_hist, ranges=[0,180,0,256], scale=1)
@@ -52,9 +47,13 @@ while True:
     kernel = np.ones((3, 3), np.uint8)
     new_img = cv2.erode(new_img, kernel)
     blur_mask = cv2.blur(new_img, (2, 2))
-    _, new_img_thresh = cv2.threshold(blur_mask, 0, 255, cv2.THRESH_BINARY)
+    _, new_img_thresh = cv2.threshold(blur_mask, 0, 255, cv2.THRESH_BINARY) """
 
-    contours, val1 = cv2.findContours(new_img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    gray_roi = cv2.GaussianBlur(cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY), (BLUR_RADIUS, BLUR_RADIUS), 0)
+
+    diff, img_thresh = BackGroundSubtract.perform_background_subtraction(gray_roi, gray_background_roi, use_external=False)
+
+    contours, val1 = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if len(contours) == 0:
         continue
 
@@ -127,11 +126,16 @@ while True:
         max_dist_hull = max([math.dist(max_hull[i][0], max_hull[i+1][0]) for i in range(len(max_hull) - 1)])
         if max_dist_hull >= 100:
             number_shown += 1
+    
+    # Params are (img, lower right coord, upper left coord, rgb color, thickness)
+    cv2.rectangle(frame, (roi_lower_X, roi_lower_Y), (roi_upper_X, roi_upper_Y), (0, 255, 0), 3)
+    cv2.putText(frame, 'Region Of Interest', (10, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
     cv2.putText(frame, 'Number: ' + str(number_shown), (20, 130), font, 1, (200, 255, 255), 2, cv2.LINE_AA)
     cv2.imshow("roi", roi)
     cv2.imshow("frame", frame)
-    cv2.imshow("BackProj Mask", new_img_thresh)
+    cv2.imshow("Hand Mask", img_thresh)
+    cv2.imshow("Diff", diff)
     
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

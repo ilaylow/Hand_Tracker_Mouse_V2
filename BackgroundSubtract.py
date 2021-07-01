@@ -52,7 +52,7 @@ class BackGroundSubtract:
             diff = cv2.absdiff(roi, background)
 
             # Threshold the difference
-            ret, thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
+            ret, thresh = cv2.threshold(diff, 10, 255, cv2.THRESH_BINARY)
             
             # Perform Image Smoothing
             cv2.erode(thresh, erode_kernel, thresh, iterations = 2)

@@ -54,78 +54,77 @@ while True:
     diff, img_thresh = BackGroundSubtract.perform_background_subtraction(gray_roi, gray_background_roi, use_external=False)
 
     contours, val1 = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if len(contours) == 0:
-        continue
-
-    max_contour = max(contours, key = cv2.contourArea)
-    return_hull = cv2.convexHull(max_contour, returnPoints = False)
+    if len(contours) != 0:
     
-    hulls = [cv2.convexHull(contour) for contour in contours]
-    hull_indices = [cv2.convexHull(contour, returnPoints = False) for contour in contours]
-
-    max_hull = max(hulls, key = cv2.contourArea)
-    try:   
-        defects = cv2.convexityDefects(max_contour, return_hull)
-    except:
-        defects = None
-        #print("Monotonous Points aren't showing due to self intersections.")
-
-    cv2.drawContours(roi, max_contour, -1, (0, 255, 0))
-    cv2.drawContours(roi, [max_hull], -1, (255, 0, 0))
-
-    # Code adapted from: https://theailearner.com/2020/11/09/convexity-defects-opencv/
-    if defects is not None:
-        for i in range(defects.shape[0]):
-            _, _, f, _ = defects[i, 0]
-            defect_point = tuple(max_contour[f][0])
-            #cv2.circle(roi, defect_point, 5, [0, 0, 255], -1)
+        max_contour = max(contours, key = cv2.contourArea)
+        return_hull = cv2.convexHull(max_contour, returnPoints = False)
         
-        # Use these convexDefects to determine the number of fingers
-        # Make the assumption that the consecutive contours with the biggest distance between them will
-        # be the ones with fingers
-        defects_point_dist = []
-        for i in range(defects.shape[0]):
-            start, end, far, _ = defects[i, 0]
-            line_start = tuple(max_contour[start][0])
-            line_far = tuple(max_contour[far][0])
-            line_end = tuple(max_contour[end][0])
-            cv2.line(roi,line_start, line_far,[106, 13, 173],2)
-            cv2.line(roi, line_far, line_end, [106, 13, 173], 2)
+        hulls = [cv2.convexHull(contour) for contour in contours]
+        hull_indices = [cv2.convexHull(contour, returnPoints = False) for contour in contours]
 
-            # Get a list of 2D Tuples, one thats the euclid dist, and the other the set of point
-            # The Euclid Dist is the average of the two adjacent lines euclid (Doesn't work as well)
-            """ euclid_dist_avg = (math.dist(line_start, line_far) + math.dist(line_far, line_end)) / 2
-            defects_point_dist.append(euclid_dist_avg) """
+        max_hull = max(hulls, key = cv2.contourArea)
+        try:   
+            defects = cv2.convexityDefects(max_contour, return_hull)
+        except:
+            defects = None
+            #print("Monotonous Points aren't showing due to self intersections.")
 
-            # Using cosine rule to determine angle between fingers so we can use it to determine number of fingers
-            # Angle = cos^-1(a^2 + b^2 - c^2 / 2ab)
+        cv2.drawContours(roi, max_contour, -1, (0, 255, 0))
+        cv2.drawContours(roi, [max_hull], -1, (255, 0, 0))
+
+        # Code adapted from: https://theailearner.com/2020/11/09/convexity-defects-opencv/
+        if defects is not None:
+            for i in range(defects.shape[0]):
+                _, _, f, _ = defects[i, 0]
+                defect_point = tuple(max_contour[f][0])
+                #cv2.circle(roi, defect_point, 5, [0, 0, 255], -1)
             
-            #Calculate line lengths
-            a = math.dist(line_far, line_start)
-            b = math.dist(line_end, line_far)
-            c = math.dist(line_start, line_end)
+            # Use these convexDefects to determine the number of fingers
+            # Make the assumption that the consecutive contours with the biggest distance between them will
+            # be the ones with fingers
+            defects_point_dist = []
+            for i in range(defects.shape[0]):
+                start, end, far, _ = defects[i, 0]
+                line_start = tuple(max_contour[start][0])
+                line_far = tuple(max_contour[far][0])
+                line_end = tuple(max_contour[end][0])
+                cv2.line(roi,line_start, line_far,[106, 13, 173],2)
+                cv2.line(roi, line_far, line_end, [106, 13, 173], 2)
 
-            angle = math.acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2*a*b))
-            
-            # Check distance for C
+                # Get a list of 2D Tuples, one thats the euclid dist, and the other the set of point
+                # The Euclid Dist is the average of the two adjacent lines euclid (Doesn't work as well)
+                """ euclid_dist_avg = (math.dist(line_start, line_far) + math.dist(line_far, line_end)) / 2
+                defects_point_dist.append(euclid_dist_avg) """
 
-            ## Need to find more robust method for detecting the true convexity defects on hand
-            # Could try some distance normalisation techniques (doesn't actually work very well)
-            # Looking at relative distances could be an option
-            norm_a = a / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
-            norm_b = b / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
-            norm_c = c / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
-            if angle < math.pi / 2 and norm_c >= 0.10:
-                print(f"A: {norm_a}")
-                print(f"B: {norm_b}")
-                print(f"C: {norm_c}")
-                cv2.circle(roi, (line_far), 5, [0, 0, 255], -1)
-                number_shown+=1
+                # Using cosine rule to determine angle between fingers so we can use it to determine number of fingers
+                # Angle = cos^-1(a^2 + b^2 - c^2 / 2ab)
                 
+                #Calculate line lengths
+                a = math.dist(line_far, line_start)
+                b = math.dist(line_end, line_far)
+                c = math.dist(line_start, line_end)
 
-        max_dist_hull = max([math.dist(max_hull[i][0], max_hull[i+1][0]) for i in range(len(max_hull) - 1)])
-        if max_dist_hull >= 100:
-            number_shown += 1
+                angle = math.acos((pow(a, 2) + pow(b, 2) - pow(c, 2)) / (2*a*b))
+                
+                # Check distance for C
+
+                ## Need to find more robust method for detecting the true convexity defects on hand
+                # Could try some distance normalisation techniques (doesn't actually work very well)
+                # Looking at relative distances could be an option
+                norm_a = a / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
+                norm_b = b / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
+                norm_c = c / math.sqrt(roi.shape[0] ** 2 + roi.shape[1] ** 2)
+                if angle < math.pi / 2:
+                    print(f"A: {norm_a}")
+                    print(f"B: {norm_b}")
+                    print(f"C: {norm_c}")
+                    cv2.circle(roi, (line_far), 5, [0, 0, 255], -1)
+                    number_shown+=1
+                    
+
+            max_dist_hull = max([math.dist(max_hull[i][0], max_hull[i+1][0]) for i in range(len(max_hull) - 1)])
+            if max_dist_hull >= 100:
+                number_shown += 1
     
     # Params are (img, lower right coord, upper left coord, rgb color, thickness)
     cv2.rectangle(frame, (roi_lower_X, roi_lower_Y), (roi_upper_X, roi_upper_Y), (0, 255, 0), 3)
@@ -139,6 +138,10 @@ while True:
     
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+    
+    elif cv2.waitKey(1) & 0xFF == ord('r'):
+        gray_background_roi = BackGroundSubtract.read_initial_background(cap)
+        print("Retook Background Frames...")
     
 
 cap.release()

@@ -1,4 +1,5 @@
 from os import stat
+import numpy as np
 import cv2
 
 # Define ROI Regions
@@ -12,8 +13,8 @@ roi_upper_Y = 380
 bg_subtractor = cv2.createBackgroundSubtractorMOG2(detectShadows=False)
 
 BLUR_RADIUS = 21
-erode_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
-dilate_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6, 6))
+erode_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6, 6))
+dilate_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
 
 class BackGroundSubtract:
     def __init__(self):
@@ -27,7 +28,11 @@ class BackGroundSubtract:
         if not success:
             exit(1)
         
-        gray_back = cv2.GaussianBlur(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), (BLUR_RADIUS, BLUR_RADIUS), 0)
+        gray_og = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        """ print(gray_og)
+        gray_og = (np.true_divide(gray_og, 0.7)).astype(np.uint8)
+        print(gray_og) """
+        gray_back = cv2.GaussianBlur(gray_og, (BLUR_RADIUS, BLUR_RADIUS), 0)
 
         return gray_back[roi_lower_Y: roi_upper_Y, roi_lower_X: roi_upper_X] 
 
@@ -52,10 +57,10 @@ class BackGroundSubtract:
             diff = cv2.absdiff(roi, background)
 
             # Threshold the difference
-            ret, thresh = cv2.threshold(diff, 10, 255, cv2.THRESH_BINARY)
+            ret, thresh = cv2.threshold(diff, 20, 255, cv2.THRESH_BINARY)
             
             # Perform Image Smoothing
             cv2.erode(thresh, erode_kernel, thresh, iterations = 2)
-            cv2.dilate(thresh, dilate_kernel, thresh, iterations = 2)
+            cv2.dilate(thresh, dilate_kernel, thresh, iterations = 4)
 
             return diff, thresh

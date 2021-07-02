@@ -8,8 +8,7 @@ import pyautogui
 from BackgroundSubtract import BackGroundSubtract
 from BackgroundSubtract import BLUR_RADIUS, roi_lower_X, roi_lower_Y, roi_upper_X, roi_upper_Y, erode_kernel, dilate_kernel
 
-# TODO: Use Both Background Subtraction and BackProjection and use bitwise and function to create a proper mask
-# TODO: Find new way to calculate point and stabilise it
+# TODO: Find a way to implement clicking mechanism
 
 pyautogui.FAILSAFE = False
 
@@ -76,23 +75,38 @@ while True:
         return_hull = cv2.convexHull(max_contour)
         return_hull_indices = cv2.convexHull(max_contour, returnPoints = False)
 
-        maxDist_Point = (0, (0, 0))
+        maxDist_Point = (0, (0, 10000))
+        point_dist_list = []
         for point in return_hull:
             point = point[0]
             cv2.circle(roi, tuple(point), 1, [0, 0, 255], 3)
             dist_from_centroid = math.dist(tuple(point), (cX, cY))
-            newPoint = (dist_from_centroid, tuple(point))
-            maxDist_Point = max(newPoint, maxDist_Point ,key=lambda x:x[0])
+            point_dist_list.append((dist_from_centroid, tuple(point)))
+            if maxDist_Point[1][1] > point[1]:
+                newPoint = (dist_from_centroid, tuple(point))
+                maxDist_Point = max(newPoint, maxDist_Point ,key=lambda x:x[0])
 
-        print(maxDist_Point)
-
-        # Draw line from centroid to furthest convex hull point
         mouse_point = maxDist_Point[1]
+
+        # Draw line from centroid to furthest convex hull point (Mouse Point)
         cv2.line(roi, (cX, cY), mouse_point, [0, 255, 0], 2)
         cv2.circle(roi, mouse_point, 2, (255, 255, 0), 3)
-            #print(point)
 
+        if (len(point_dist_list) >= 5):
+            point_dist_list.sort(key = lambda x:x[0], reverse = True)
+            point_dist_list = point_dist_list[:5]
+
+            # Get the second further point away to initiate click
+            click_point = point_dist_list[1][1]
         
+            # Get distance from mouse point to click point
+            click_mouse_dist = math.dist(mouse_point, click_point)
+            print(click_mouse_dist)
+            
+            if click_mouse_dist < 50 and click_mouse_dist > 20:
+                cv2.line(roi, (cX, cY), click_point, [0, 0, 255], 2)
+                cv2.circle(roi, click_point, 2, (255, 255, 0), 3)
+
 
         """ dist_hull = [(math.dist(return_hull[i][0], return_hull[i + 1][0]), (return_hull[i][0], return_hull[i + 1][0])) for i in range(len(return_hull) - 1)]
         dist_hull.sort(reverse = True, key = lambda x: x[0])

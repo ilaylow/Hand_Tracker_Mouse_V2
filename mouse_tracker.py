@@ -127,7 +127,7 @@ while True:
         dy = midpoint_mouse[1] """
 
         # Find a way to stabilise the mouse due to fluctuations 
-        pyautogui.moveTo(mouse_point[0] * 6.736, mouse_point[1] * 5.684)
+        #pyautogui.moveTo(mouse_point[0] * 6.736, mouse_point[1] * 5.684)
     
     # Params are (img, lower right coord, upper left coord, rgb color, thickness)
     cv2.rectangle(frame, (roi_lower_X, roi_lower_Y), (roi_upper_X, roi_upper_Y), (0, 255, 0), 3)

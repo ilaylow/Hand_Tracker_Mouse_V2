@@ -46,6 +46,14 @@ Lastly, please note that performance may differ heavily depending on background 
 
 *Insert Information Here About Background Subtration Method*
 
+![Using Count_Fingers.py](/images/[Subtract]counting_fingers.png)
+
+![Using Count_Fingers.py](/images/[Subtract]mouse_tracker.png)
+
+## How To Use
+
+
+
 **Have fun!**
 
 

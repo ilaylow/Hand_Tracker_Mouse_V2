@@ -34,25 +34,31 @@ def main():
             
             index_finger_x_norm = right_hand_landmark_list[mp_hands.HandLandmark.INDEX_FINGER_TIP].x
             index_finger_y_norm = right_hand_landmark_list[mp_hands.HandLandmark.INDEX_FINGER_TIP].y
+            middle_finger_x_norm = right_hand_landmark_list[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].x
+            middle_finger_y_norm = right_hand_landmark_list[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y
             thumb_tip_x_norm = right_hand_landmark_list[mp_hands.HandLandmark.THUMB_TIP].x
             thumb_tip_y_norm = right_hand_landmark_list[mp_hands.HandLandmark.THUMB_TIP].y
 
             index_finger_x = round(index_finger_x_norm * image_width)
             index_finger_y = round(index_finger_y_norm * image_height)
 
+            middle_finger_x = round(middle_finger_x_norm * image_width)
+            middle_finger_y = round(middle_finger_y_norm * image_height)
+
             thumb_tip_x = round(thumb_tip_x_norm * image_width)
             thumb_tip_y = round(thumb_tip_y_norm * image_height)
 
             cv2.circle(frame, (thumb_tip_x, thumb_tip_y), 4, (128,0,128), 3)
             cv2.circle(frame, (index_finger_x, index_finger_y), 4, (0, 255, 0), 3)
+            cv2.circle(frame, (middle_finger_x, middle_finger_y), 4, (0, 255, 255), 3)
 
-            cv2.circle(hand_frame, (thumb_tip_x, thumb_tip_y), 4, (128,0,128), 3)
-            cv2.circle(hand_frame, (index_finger_x, index_finger_y), 4, (0, 255, 0), 3)
+
 
             # Check distance between thumb tip and index finger
-            thumb_index_dist = math.dist((index_finger_x_norm, index_finger_y_norm), (thumb_tip_x_norm, thumb_tip_y_norm))
-            if thumb_index_dist < 0.05:
+            thumb_middle_dist = math.dist((middle_finger_x_norm, middle_finger_y_norm), (thumb_tip_x_norm, thumb_tip_y_norm))
+            if thumb_middle_dist < 0.05:
                 cv2.putText(frame, "Click", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+                cv2.putText(hand_frame, "Click", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
                 x, y = pyautogui.position()
                 #pyautogui.leftClick(x, y)
                 print("Clickity Clack Clack Clack")

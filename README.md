@@ -3,7 +3,7 @@
 **Note that the above is still in its experimental changes as the algorithm lacks stability.**
 **Update(2/7/2021) The algorithm, after implementing Background Subtraction, in place of Backprojection, has become much more stable.**
 
-**Important Things To Note: The hands exposure to light and color relative to the background is important when atttempting background subtraction. Thus, to ensure that algorithm is run as intended, run in an environment where hand is visibly illuminated and a plain backgroun is present.**
+**Important Things To Note: The hands exposure to light and color relative to the background is important when atttempting background subtraction. Thus, to ensure that algorithm is run as intended, run in an environment where hand is visibly illuminated and a plain background is present.**
 
 The code above is an attempt to experiment with skin detection with different colorspaces through Image BackProjection with the OpenCV library for Python. (Update) Upon researching further methods, the current implementation now takes advantage of a method called Background Subtraction, which will be further illustrated below.
 
@@ -50,9 +50,9 @@ Lastly, please note that performance may differ heavily depending on background 
 
 ![Using Count_Fingers.py](/images/[Subtract]mouse_tracker.png)
 
-## How To Use
+### Google's Mediapipe Hand Detection Model
 
-
+![Google's Hand Model Detection In Action](/images/google_mediapipe_hand_tracking.gif)
 
 **Have fun!**
 

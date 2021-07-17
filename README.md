@@ -50,9 +50,9 @@ Lastly, please note that performance may differ heavily depending on background 
 
 ![Using Count_Fingers.py](/images/[Subtract]mouse_tracker.png)
 
-## How To Use
+### Google's Mediapipe Hand Detection Model
 
-
+![Google's Hand Model Detection In Action](/images/google_mediapipe_hand_tracking.gif)
 
 **Have fun!**
 

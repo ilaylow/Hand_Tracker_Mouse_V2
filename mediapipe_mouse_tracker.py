@@ -1,3 +1,11 @@
+"""
+This script utilises Google's Mediapipe Models to perform a real time hand detection by detection appropriate
+hand landmarks and uses these landmarks to map the movement to the computer's mouse, and enables a clicking
+function by using a distance checker between the middle finger and thumb.
+
+Scripts including use of mediapipe models has code derived from: https://google.github.io/mediapipe/solutions/solutions.html
+"""
+
 import cv2
 import mediapipe 
 import numpy as np

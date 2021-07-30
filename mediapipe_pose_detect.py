@@ -1,3 +1,8 @@
+"""
+This script utilises Google's Mediapipe Models to perform Real-Time Pose Detection.
+Purely Experimental. 
+"""
+
 import cv2
 import mediapipe 
 import numpy as np

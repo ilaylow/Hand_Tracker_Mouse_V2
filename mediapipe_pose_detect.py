@@ -22,12 +22,8 @@ def main():
         
         hand_frame = np.zeros((image_height, image_width, 3))
 
-        if results.right_hand_landmarks is not None:
-            for landmark in list(results.right_hand_landmarks.landmark):
-                cv2.circle(frame, (round(landmark.x * image_width), round(landmark.y * image_height)), 3, (255, 0, 0), 2)
-                cv2.circle(hand_frame, (round(landmark.x * image_width), round(landmark.y * image_height)), 3, (255, 255, 0), 3)
         # Draw Face
-        #mp_drawing.draw_landmarks(frame, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
+        mp_drawing.draw_landmarks(frame, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
 
         # Draw Right Hand
         mp_drawing.draw_landmarks(frame, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,

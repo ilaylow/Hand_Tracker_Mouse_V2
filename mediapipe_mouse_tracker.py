@@ -10,6 +10,11 @@ mp_hands = mediapipe.solutions.hands
 
 cap = cv2.VideoCapture(0)
 
+def calc_dist(tup1, tup2):
+    diff1 = (tup2[0] - tup1[0]) ** 2
+    diff2 = (tup2[1] - tup1[1]) ** 2
+    return math.sqrt(diff1 + diff2)
+
 def main():
 
     holistic = mp_holistic.Holistic(min_detection_confidence= 0.5, min_tracking_confidence=0.5)
@@ -55,7 +60,7 @@ def main():
 
 
             # Check distance between thumb tip and index finger
-            thumb_middle_dist = math.dist((middle_finger_x_norm, middle_finger_y_norm), (thumb_tip_x_norm, thumb_tip_y_norm))
+            thumb_middle_dist = calc_dist((middle_finger_x_norm, middle_finger_y_norm), (thumb_tip_x_norm, thumb_tip_y_norm))
             if thumb_middle_dist < 0.05:
                 cv2.putText(frame, "Click", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
                 cv2.putText(hand_frame, "Click", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)

@@ -23,7 +23,7 @@ def main():
         hand_frame = np.zeros((image_height, image_width, 3))
 
         # Draw Face
-        #mp_drawing.draw_landmarks(frame, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
+        mp_drawing.draw_landmarks(frame, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
 
         # Draw Right Hand
         mp_drawing.draw_landmarks(frame, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,

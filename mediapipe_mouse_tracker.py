@@ -60,7 +60,7 @@ def main():
 
 
             # Check distance between thumb tip and index finger
-            """thumb_middle_dist = calc_dist((middle_finger_x_norm, middle_finger_y_norm), (thumb_tip_x_norm, thumb_tip_y_norm))
+            thumb_middle_dist = calc_dist((middle_finger_x_norm, middle_finger_y_norm), (thumb_tip_x_norm, thumb_tip_y_norm))
             if thumb_middle_dist < 0.05:
                 cv2.putText(frame, "Click", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
                 cv2.putText(hand_frame, "Click", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
@@ -68,7 +68,7 @@ def main():
                 #pyautogui.leftClick(x, y)
                 print("Clickity Clack Clack Clack")
             
-            pyautogui.moveTo(index_finger_x * 3, index_finger_y * 2.25) """
+            pyautogui.moveTo(index_finger_x * 3, index_finger_y * 2.25)
 
 
         cv2.imshow("Frame", frame)
